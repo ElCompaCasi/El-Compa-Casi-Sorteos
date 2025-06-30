@@ -61,9 +61,31 @@
     margin: 20px auto 0;
     width: max-content;
     font-weight: bold;
+    cursor: pointer;
   }
   .whatsapp-button:hover {
     background: #1ebe57;
+  }
+  #formulario-datos {
+    display: none;
+    margin-top: 20px;
+  }
+  #formulario-datos input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+  }
+  #enviar-formulario {
+    background: #25D366;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
   }
 </style>
 </head>
@@ -76,13 +98,23 @@
     <table id="tabla-numeros"></table>
   </div>
 
-  <a id="whatsapp-button" class="whatsapp-button" target="_blank">Enviar Comprobante por WhatsApp</a>
+  <div id="formulario-datos">
+    <input type="text" id="nombre" placeholder="Nombre y Apellido" required>
+    <input type="tel" id="telefono" placeholder="Número de Teléfono" required>
+    <button id="enviar-formulario">Enviar Comprobante por WhatsApp</button>
+  </div>
+
+  <div style="text-align: center;">
+    <button id="whatsapp-button" class="whatsapp-button">Enviar Comprobante</button>
+  </div>
 </div>
 
 <script>
 const apiUrl = "https://script.google.com/macros/s/AKfycbx9x_Uaww3AV_CcZdcjnPKD2fpaElbEKNFxWySllORi7GVuUYt37DIcRqjmXuU34VCf/exec";
 const tabla = document.getElementById('tabla-numeros');
 const whatsappBtn = document.getElementById('whatsapp-button');
+const form = document.getElementById('formulario-datos');
+const btnEnviar = document.getElementById('enviar-formulario');
 const seleccionados = new Set();
 
 fetch(apiUrl)
@@ -111,14 +143,27 @@ fetch(apiUrl)
   });
 
 function actualizarBoton() {
-  if (seleccionados.size > 0) {
-    const numeros = Array.from(seleccionados).join(', ');
-    whatsappBtn.href = `https://wa.me/526671895067?text=Hola,%20quiero%20participar%20en%20la%20rifa.%20Mis%20números%20seleccionados%20son:%20${numeros}`;
-    whatsappBtn.style.display = 'block';
-  } else {
-    whatsappBtn.style.display = 'none';
-  }
+  whatsappBtn.style.display = seleccionados.size > 0 ? 'block' : 'none';
+  form.style.display = 'none';
 }
+
+whatsappBtn.addEventListener('click', () => {
+  form.style.display = 'block';
+  whatsappBtn.style.display = 'none';
+});
+
+btnEnviar.addEventListener('click', () => {
+  const nombre = document.getElementById('nombre').value.trim();
+  const telefono = document.getElementById('telefono').value.trim();
+  const numeros = Array.from(seleccionados).join(', ');
+  if (!nombre || !telefono) {
+    alert('Por favor llena todos los campos.');
+    return;
+  }
+  const mensaje = `Hola, quiero participar en la rifa.\nNombre: ${nombre}\nTeléfono: ${telefono}\nNúmeros seleccionados: ${numeros}`;
+  const enlace = `https://wa.me/526671895097?text=${encodeURIComponent(mensaje)}`;
+  window.open(enlace, '_blank');
+});
 </script>
 </body>
 </html>
